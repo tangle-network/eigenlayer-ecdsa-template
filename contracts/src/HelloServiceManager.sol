@@ -59,7 +59,7 @@ contract HelloServiceManager is ECDSAServiceManagerBase {
     // Only allows the challenger the operator is enrolled in to call the function
     modifier onlyEnrolledChallenger(address operator) {
         (bool exists,) = enrolledChallengers[operator].tryGet(msg.sender);
-        require(exists, "TangleServiceManager: Operator not enrolled in challenger");
+        require(exists, "HelloServiceManager: Operator not enrolled in challenger");
         _;
     }
 
@@ -171,7 +171,7 @@ contract HelloServiceManager is ECDSAServiceManagerBase {
     function startUnenrollment(IRemoteChallenger challenger) public {
         (bool exists, Enrollment memory enrollment) = enrolledChallengers[msg.sender].tryGet(address(challenger));
         require(
-            exists && enrollment.status == EnrollmentStatus.ENROLLED, "TangleServiceManager: challenger isn't enrolled"
+            exists && enrollment.status == EnrollmentStatus.ENROLLED, "HelloServiceManager: challenger isn't enrolled"
         );
 
         enrolledChallengers[msg.sender].set(
@@ -215,7 +215,7 @@ contract HelloServiceManager is ECDSAServiceManagerBase {
         require(
             exists && enrollment.status == EnrollmentStatus.PENDING_UNENROLLMENT
                 && block.number >= enrollment.unenrollmentStartBlock + challenger.challengeDelayBlocks(),
-            "TangleServiceManager: Invalid unenrollment"
+            "HelloServiceManager: Invalid unenrollment"
         );
 
         enrolledChallengers[operator].remove(address(challenger));

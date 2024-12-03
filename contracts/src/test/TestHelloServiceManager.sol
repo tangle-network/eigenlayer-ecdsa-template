@@ -2,7 +2,7 @@
 pragma solidity >=0.8.0;
 
 import {Enrollment, EnrollmentStatus, EnumerableMapEnrollment} from "../libs/EnumerableMapEnrollment.sol";
-import {HelloServiceManager} from "../TangleServiceManager.sol";
+import {HelloServiceManager} from "../HelloServiceManager.sol";
 
 contract TestHelloServiceManager is HelloServiceManager {
     using EnumerableMapEnrollment for EnumerableMapEnrollment.AddressToEnrollmentMap;
@@ -13,7 +13,7 @@ contract TestHelloServiceManager is HelloServiceManager {
         address _paymentCoordinator,
         address _delegationManager,
         address _mailbox
-    ) TangleServiceManager(_avsDirectory, _stakeRegistry, _delegationManager) {}
+    ) HelloServiceManager(_avsDirectory, _stakeRegistry, _delegationManager) {}
 
     function mockSetUnenrolled(address operator, address challenger) external {
         enrolledChallengers[operator].set(address(challenger), Enrollment(EnrollmentStatus.UNENROLLED, 0));
