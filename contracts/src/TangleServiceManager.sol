@@ -8,7 +8,7 @@ import {ISlasher} from "./interfaces/vendored/ISlasher.sol";
 import {ECDSAServiceManagerBase} from "./ECDSAServiceManagerBase.sol";
 import {IRemoteChallenger} from "./interfaces/IRemoteChallenger.sol";
 
-contract HelloServiceManager is ECDSAServiceManagerBase {
+contract TangleServiceManager is ECDSAServiceManagerBase {
     // ============ Libraries ============
 
     using EnumerableMapEnrollment for EnumerableMapEnrollment.AddressToEnrollmentMap;
@@ -59,7 +59,7 @@ contract HelloServiceManager is ECDSAServiceManagerBase {
     // Only allows the challenger the operator is enrolled in to call the function
     modifier onlyEnrolledChallenger(address operator) {
         (bool exists,) = enrolledChallengers[operator].tryGet(msg.sender);
-        require(exists, "HelloServiceManager: Operator not enrolled in challenger");
+        require(exists, "TangleServiceManager: Operator not enrolled in challenger");
         _;
     }
 
@@ -79,7 +79,7 @@ contract HelloServiceManager is ECDSAServiceManagerBase {
     {}
 
     /**
-     * @notice Initializes the HelloServiceManager.sol contract with the owner address
+     * @notice Initializes the TangleServiceManager.sol contract with the owner address
      */
     function initialize(address _owner) public initializer {
         __ServiceManagerBase_init(_owner);
@@ -171,7 +171,7 @@ contract HelloServiceManager is ECDSAServiceManagerBase {
     function startUnenrollment(IRemoteChallenger challenger) public {
         (bool exists, Enrollment memory enrollment) = enrolledChallengers[msg.sender].tryGet(address(challenger));
         require(
-            exists && enrollment.status == EnrollmentStatus.ENROLLED, "HelloServiceManager: challenger isn't enrolled"
+            exists && enrollment.status == EnrollmentStatus.ENROLLED, "TangleServiceManager: challenger isn't enrolled"
         );
 
         enrolledChallengers[msg.sender].set(
@@ -215,7 +215,7 @@ contract HelloServiceManager is ECDSAServiceManagerBase {
         require(
             exists && enrollment.status == EnrollmentStatus.PENDING_UNENROLLMENT
                 && block.number >= enrollment.unenrollmentStartBlock + challenger.challengeDelayBlocks(),
-            "HelloServiceManager: Invalid unenrollment"
+            "TangleServiceManager: Invalid unenrollment"
         );
 
         enrolledChallengers[operator].remove(address(challenger));

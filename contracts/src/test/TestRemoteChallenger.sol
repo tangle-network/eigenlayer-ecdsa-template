@@ -2,12 +2,12 @@
 pragma solidity >=0.8.0;
 
 import {IRemoteChallenger} from "../interfaces/IRemoteChallenger.sol";
-import {HelloServiceManager} from "../HelloServiceManager.sol";
+import {TangleServiceManager} from "../TangleServiceManager.sol";
 
 contract TestRemoteChallenger is IRemoteChallenger {
-    HelloServiceManager internal immutable tsm;
+    TangleServiceManager internal immutable tsm;
 
-    constructor(HelloServiceManager _tsm) {
+    constructor(TangleServiceManager _tsm) {
         tsm = _tsm;
     }
 

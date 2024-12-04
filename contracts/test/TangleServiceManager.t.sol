@@ -15,14 +15,14 @@ import {ISignatureUtils} from "../src/interfaces/vendored/ISignatureUtils.sol";
 import {Enrollment, EnrollmentStatus} from "../src/libs/EnumerableMapEnrollment.sol";
 import {IRemoteChallenger} from "../src/interfaces/IRemoteChallenger.sol";
 
-import {HelloServiceManager} from "../src/HelloServiceManager.sol";
-import {TestHelloServiceManager} from "../src/test/TestHelloServiceManager.sol";
+import {TangleServiceManager} from "../src/TangleServiceManager.sol";
+import {TestTangleServiceManager} from "../src/test/TestTangleServiceManager.sol";
 import {TestRemoteChallenger} from "../src/test/TestRemoteChallenger.sol";
 
 import {EigenlayerBase} from "./EigenlayerBase.sol";
 
-contract HelloServiceManagerTest is EigenlayerBase {
-    TestHelloServiceManager internal _tsm;
+contract TangleServiceManagerTest is EigenlayerBase {
+    TestTangleServiceManager internal _tsm;
     ECDSAStakeRegistry internal _ecdsaStakeRegistry;
     TestPaymentCoordinator internal _paymentCoordinator;
 
@@ -45,7 +45,7 @@ contract HelloServiceManagerTest is EigenlayerBase {
         // TODO: Investigate Hyperlane testing infra
         address _mailbox = address(0);
 
-        _tsm = new TestHelloServiceManager(
+        _tsm = new TestTangleServiceManager(
             address(avsDirectory),
             address(_ecdsaStakeRegistry),
             address(_paymentCoordinator),
@@ -161,14 +161,14 @@ contract HelloServiceManagerTest is EigenlayerBase {
 
         vm.startPrank(operator);
 
-        vm.expectRevert("HelloServiceManager: challenger isn't enrolled");
+        vm.expectRevert("TangleServiceManager: challenger isn't enrolled");
         _tsm.startUnenrollment(challengers);
 
         _tsm.enrollIntoChallengers(challengers);
         _tsm.startUnenrollment(challengers);
         _assertChallengers(challengers, EnrollmentStatus.PENDING_UNENROLLMENT, block.number);
 
-        vm.expectRevert("HelloServiceManager: challenger isn't enrolled");
+        vm.expectRevert("TangleServiceManager: challenger isn't enrolled");
         _tsm.startUnenrollment(challengers);
         _assertChallengers(challengers, EnrollmentStatus.PENDING_UNENROLLMENT, block.number);
 
@@ -270,7 +270,7 @@ contract HelloServiceManagerTest is EigenlayerBase {
         _tsm.completeUnenrollment(unenrollableChallengers);
 
         for (uint256 i = 0; i < unenrollableChallengers.length; i++) {
-            vm.expectRevert("HelloServiceManager: Operator not enrolled in challenger");
+            vm.expectRevert("TangleServiceManager: Operator not enrolled in challenger");
             IRemoteChallenger(unenrollableChallengers[i]).handleChallenge(operator);
         }
         for (uint256 i = 0; i < otherChallengeChallengers.length; i++) {
@@ -291,12 +291,12 @@ contract HelloServiceManagerTest is EigenlayerBase {
         _tsm.enrollIntoChallengers(challengers);
         _assertChallengers(challengers, EnrollmentStatus.ENROLLED, 0);
 
-        vm.expectRevert("HelloServiceManager: Invalid unenrollment");
+        vm.expectRevert("TangleServiceManager: Invalid unenrollment");
         _ecdsaStakeRegistry.deregisterOperator();
 
         _tsm.startUnenrollment(challengers);
 
-        vm.expectRevert("HelloServiceManager: Invalid unenrollment");
+        vm.expectRevert("TangleServiceManager: Invalid unenrollment");
         _ecdsaStakeRegistry.deregisterOperator();
 
         vm.roll(block.number + challengeDelayBlocks);
