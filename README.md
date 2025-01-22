@@ -2,6 +2,11 @@
 
 **A simple Hello World AVS for EigenLayer with the ECDSA-based Contract Configuration**
 
+## 📚 Overview
+
+This project is about creating a simple Hello World AVS for EigenLayer.
+An AVS (Actively Validated Service) is an off-chain service that runs arbitrary computations for a user-specified period of time.
+
 ## 📚 Prerequisites
 
 Before you can run this project, you will need to have the following software installed on your machine:
@@ -43,17 +48,11 @@ cargo tangle blueprint create --name ecdsa-test --eigenlayer ECDSA
 Upon running the above command, you will be prompted with questions regarding the setup for your generated project. If you aren't sure for any of them, you can just hit enter to select the default for that questions. 
 
 ### Note
-If you choose to use `foundry.toml` for the Soldeer configuration (the default), you will need to delete the following files from the `contracts` directory:
-- `foundry.toml`
-- `remappings.txt`
-- `soldeer.lock`
+If the soldeer fails to update/install the necessary dependencies, you may just have to run it manually with the following command:
 
-This will allow the generated project to work out of the box. This will be fixed in the future, so that nothing needs to be deleted.
-
-## 📚 Overview
-
-This project is about creating a simple Hello World AVS for EigenLayer.
-An AVS (Actively Validated Service) is an off-chain service that runs arbitrary computations for a user-specified period of time.
+```bash
+forge soldeer update -d
+```
 
 ## 📜 License
 
