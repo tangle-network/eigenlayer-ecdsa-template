@@ -48,7 +48,7 @@ cargo tangle blueprint create --name ecdsa-test --eigenlayer ECDSA
 Upon running the above command, you will be prompted with questions regarding the setup for your generated project. If you aren't sure for any of them, you can just hit enter to select the default for that questions. 
 
 ### Note
-If the soldeer fails to update/install the necessary dependencies, you may just have to run it manually with the following command:
+If Soldeer fails to update/install the necessary dependencies, you may need to run it manually with the following command:
 
 ```bash
 forge soldeer update -d
