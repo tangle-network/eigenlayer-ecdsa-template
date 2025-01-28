@@ -19,7 +19,7 @@ serde = { version = "1.0.188", features = ["derive"] }
 async-trait = { version = "0.1.85" }
 
 [build-dependencies]
-blueprint-sdk = { path = "../gadget/crates/sdk", default-features = false, features = ["build"] }
+blueprint-sdk = { git = "https://github.com/tangle-network/gadget-workspace.git", default-features = false, features = ["build"] }
 
 [features]
 default = ["std"]
