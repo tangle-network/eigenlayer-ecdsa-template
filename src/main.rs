@@ -5,7 +5,7 @@ use blueprint_sdk::logging::info;
 use blueprint_sdk::macros::main;
 use blueprint_sdk::runners::core::runner::BlueprintRunner;
 use blueprint_sdk::utils::evm::get_provider_http;
-use ecdsa::config::EigenlayerECDSAConfig;
+use blueprint::config::EigenlayerECDSAConfig;
 
 #[main(env)]
 async fn main() {
