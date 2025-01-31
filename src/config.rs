@@ -161,6 +161,7 @@ async fn register_ecdsa_impl(
     );
 
     let el_writer = ELChainWriter::new(
+        delegation_manager_address,
         strategy_manager_address,
         rewards_coordinator_address,
         el_chain_reader.clone(),
