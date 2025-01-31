@@ -8,6 +8,7 @@ use blueprint_sdk::macros::load_abi;
 use blueprint_sdk::std::convert::Infallible;
 use blueprint_sdk::std::sync::LazyLock;
 use serde::{Deserialize, Serialize};
+pub mod config;
 
 type ProcessorError =
     blueprint_sdk::event_listeners::core::Error<blueprint_sdk::event_listeners::evm::error::Error>;
