@@ -5,8 +5,9 @@ pragma solidity >=0.8.0;
 import {Enrollment, EnrollmentStatus, EnumerableMapEnrollment} from "./libs/EnumerableMapEnrollment.sol";
 import {IAVSDirectory} from "./interfaces/vendored/IAVSDirectory.sol";
 import {ISlasher} from "./interfaces/vendored/ISlasher.sol";
-import {ECDSAServiceManagerBase} from "./ECDSAServiceManagerBase.sol";
+import {ECDSAServiceManagerBase} from "../../dependencies/eigenlayer-middleware-0.2.1/src/unaudited/ECDSAServiceManagerBase.sol";
 import {IRemoteChallenger} from "./interfaces/IRemoteChallenger.sol";
+import {ISlasher} from "./interfaces/vendored/ISlasher.sol";
 
 contract TangleServiceManager is ECDSAServiceManagerBase {
     // ============ Libraries ============
@@ -236,6 +237,31 @@ contract TangleServiceManager is ECDSAServiceManagerBase {
     struct OperatorKeys {
         bytes validatorKeys;
         bytes32 accountKey;
+    }
+
+    /// @dev Defines the structure of a task.
+    struct Task {
+        uint32 taskCreatedBlock;
+        uint32 quorumThresholdPercentage;
+        bytes message;
+        bytes quorumNumbers;
+    }
+
+    // Task response is hashed and signed by operators.
+    // these signatures are aggregated and sent to the contract as response.
+    struct TaskResponse {
+        // Can be obtained by the operator from the event NewTaskCreated.
+        uint32 referenceTaskIndex;
+        // This is just the response that the operator has to compute by itself.
+        bytes message;
+    }
+
+    // Extra information related to taskResponse, which is filled inside the contract.
+    // It thus cannot be signed by operators, so we keep it in a separate struct than TaskResponse
+    // This metadata is needed by the challenger, so we emit it in the TaskResponded event
+    struct TaskResponseMetadata {
+        uint32 taskResponsedBlock;
+        bytes32 hashOfNonSigners;
     }
 
     /// @notice Mapping to store operator keys
