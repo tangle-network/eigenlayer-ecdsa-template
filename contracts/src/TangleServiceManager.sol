@@ -3,11 +3,10 @@ pragma solidity >=0.8.0;
 
 // ============ Internal Imports ============
 import {Enrollment, EnrollmentStatus, EnumerableMapEnrollment} from "./libs/EnumerableMapEnrollment.sol";
-import {IAVSDirectory} from "./interfaces/vendored/IAVSDirectory.sol";
-import {ISlasher} from "./interfaces/vendored/ISlasher.sol";
-import {ECDSAServiceManagerBase} from "../../dependencies/eigenlayer-middleware-0.2.1/src/unaudited/ECDSAServiceManagerBase.sol";
+import {IAVSDirectory} from "@eigenlayer-contracts/interfaces/IAVSDirectory.sol";
+import {ISlasher} from "@eigenlayer-contracts/interfaces/ISlasher.sol";
+import {ECDSAServiceManagerBase} from "eigenlayer-middleware/src/unaudited/ECDSAServiceManagerBase.sol";
 import {IRemoteChallenger} from "./interfaces/IRemoteChallenger.sol";
-import {ISlasher} from "./interfaces/vendored/ISlasher.sol";
 
 contract TangleServiceManager is ECDSAServiceManagerBase {
     // ============ Libraries ============
@@ -21,6 +20,18 @@ contract TangleServiceManager is ECDSAServiceManagerBase {
     ISlasher internal slasher;
 
     // ============ Events ============
+
+    /**
+     * @notice Emitted when an operator is registered to the AVS
+     * @param operator The address of the operator
+     */
+    event OperatorRegisteredToAVS(address indexed operator);
+
+    /**
+     * @notice Emitted when an operator is deregistered from the AVS
+     * @param operator The address of the operator
+     */
+    event OperatorDeregisteredFromAVS(address indexed operator);
 
     /**
      * @notice Emitted when an operator is enrolled in a challenger
@@ -82,8 +93,8 @@ contract TangleServiceManager is ECDSAServiceManagerBase {
     /**
      * @notice Initializes the TangleServiceManager.sol contract with the owner address
      */
-    function initialize(address _owner) public initializer {
-        __ServiceManagerBase_init(_owner);
+    function initialize(address _owner, address _rewardsInitiator) public initializer {
+        __ServiceManagerBase_init(_owner, _rewardsInitiator);
     }
 
     // ============ External Functions ============

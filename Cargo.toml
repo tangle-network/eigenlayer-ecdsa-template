@@ -13,14 +13,14 @@ keywords = ["tangle", "blueprint", "avs"]
 rust-version = "1.81"
 
 [dependencies]
-#blueprint-sdk = { git = "https://github.com/tangle-network/gadget", default-features = false, features = ["eigenlayer", "evm", "macros", "build"] }
-blueprint-sdk = { path = "../gadget/crates/sdk", default-features = false, features = ["eigenlayer", "evm", "macros", "build"] }
+blueprint-sdk = { git = "https://github.com/tangle-network/gadget", default-features = false, features = ["eigenlayer", "evm", "macros", "build"] }
+#blueprint-sdk = { path = "../gadget/crates/sdk", default-features = false, features = ["eigenlayer", "evm", "macros", "build"] }
 serde = { version = "1.0.188", features = ["derive"] }
 async-trait = { version = "0.1.85" }
 
 [build-dependencies]
-#blueprint-sdk = { git = "https://github.com/tangle-network/gadget", default-features = false, features = ["build"] }
-blueprint-sdk = { path = "../gadget/crates/sdk", default-features = false, features = ["build"] }
+blueprint-sdk = { git = "https://github.com/tangle-network/gadget", default-features = false, features = ["build"] }
+#blueprint-sdk = { path = "../gadget/crates/sdk", default-features = false, features = ["build"] }
 
 
 [features]

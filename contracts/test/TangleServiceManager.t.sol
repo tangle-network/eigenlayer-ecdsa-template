@@ -1,24 +1,20 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 pragma solidity >=0.8.0;
 
-import {IDelegationManager} from "../src/interfaces/vendored/IDelegationManager.sol";
-import {ISlasher} from "../src/interfaces/vendored/ISlasher.sol";
-
-import {IAVSDirectory} from "../src/interfaces/vendored/IAVSDirectory.sol";
-import {Quorum, StrategyParams} from "../src/interfaces/vendored/IECDSAStakeRegistryEventsAndErrors.sol";
+import {IDelegationManager} from "@eigenlayer-contracts/interfaces/IDelegationManager.sol";
+import {ISlasher} from "@eigenlayer-contracts/interfaces/ISlasher.sol";
+import {IAVSDirectory} from "@eigenlayer-contracts/interfaces/IAVSDirectory.sol";
+import {Quorum, StrategyParams} from "eigenlayer-middleware/src/interfaces/IECDSAStakeRegistryEventsAndErrors.sol";
 import {TestDelegationManager} from "../src/test/TestDelegationManager.sol";
-import {ECDSAStakeRegistry} from "../src/ECDSAStakeRegistry.sol";
+import {ECDSAStakeRegistry} from "eigenlayer-middleware/src/unaudited/ECDSAStakeRegistry.sol";
 import {TestPaymentCoordinator} from "../src/test/TestPaymentCoordinator.sol";
-
-import {IStrategy} from "../src/interfaces/vendored/IStrategy.sol";
-import {ISignatureUtils} from "../src/interfaces/vendored/ISignatureUtils.sol";
+import {IStrategy} from "@eigenlayer-contracts/interfaces/IStrategy.sol";
+import {ISignatureUtils} from "@eigenlayer-contracts/interfaces/ISignatureUtils.sol";
 import {Enrollment, EnrollmentStatus} from "../src/libs/EnumerableMapEnrollment.sol";
 import {IRemoteChallenger} from "../src/interfaces/IRemoteChallenger.sol";
-
 import {TangleServiceManager} from "../src/TangleServiceManager.sol";
 import {TestTangleServiceManager} from "../src/test/TestTangleServiceManager.sol";
 import {TestRemoteChallenger} from "../src/test/TestRemoteChallenger.sol";
-
 import {EigenlayerBase} from "./EigenlayerBase.sol";
 
 contract TangleServiceManagerTest is EigenlayerBase {
@@ -52,8 +48,8 @@ contract TangleServiceManagerTest is EigenlayerBase {
             address(delegationManager),
             address(_mailbox)
         );
-        _tsm.initialize(address(this));
-        _tsm.setSlasher(slasher);
+        _tsm.initialize(address(this), address(this));
+        _tsm.setSlasher(ISlasher(address(slasher)));
 
         IStrategy mockStrategy = IStrategy(address(0x1234));
         Quorum memory quorum = Quorum({strategies: new StrategyParams[](1)});
@@ -65,14 +61,14 @@ contract TangleServiceManagerTest is EigenlayerBase {
         vm.prank(operator);
         delegationManager.registerAsOperator(
             IDelegationManager.OperatorDetails({
-                earningsReceiver: operator,
+                __deprecated_earningsReceiver: operator,
                 delegationApprover: address(0),
                 stakerOptOutWindowBlocks: 0
             }),
             ""
         );
         // set operator as registered in Eigenlayer
-        delegationManager.setIsOperator(operator, true);
+        TestDelegationManager(address(delegationManager)).setIsOperator(operator, true);
     }
 
     event AVSMetadataURIUpdated(address indexed avs, string metadataURI);
@@ -328,7 +324,7 @@ contract TangleServiceManagerTest is EigenlayerBase {
         IRemoteChallenger[] memory _challengers,
         EnrollmentStatus _expectedstatus,
         uint256 _expectUnenrollmentBlock
-    ) internal {
+    ) internal view {
         for (uint256 i = 0; i < _challengers.length; i++) {
             Enrollment memory enrollment = _tsm.getChallengerEnrollment(operator, _challengers[i]);
             assertEq(uint8(enrollment.status), uint8(_expectedstatus));
