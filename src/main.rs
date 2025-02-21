@@ -1,4 +1,4 @@
-use ecdsa as blueprint;
+use {{project-name | snake_case}} as blueprint;
 use blueprint::{TangleServiceManager, SERVICE_MANAGER_ADDRESS};
 use blueprint_sdk::alloy::primitives::Address;
 use blueprint_sdk::logging::info;

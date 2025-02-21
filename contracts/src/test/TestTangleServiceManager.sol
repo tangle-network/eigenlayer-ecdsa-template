@@ -16,6 +16,6 @@ contract TestTangleServiceManager is TangleServiceManager {
     ) TangleServiceManager(_avsDirectory, _stakeRegistry, _delegationManager) {}
 
     function mockSetUnenrolled(address operator, address challenger) external {
-        enrolledChallengers[operator].set(address(challenger), Enrollment(EnrollmentStatus.UNENROLLED, 0));
+        _enrolledChallengers[operator].set(address(challenger), Enrollment(EnrollmentStatus.UNENROLLED, 0));
     }
 }

@@ -5,6 +5,10 @@ import {IDelegationManager} from "@eigenlayer-contracts/interfaces/IDelegationMa
 import {IStrategy} from "@eigenlayer-contracts/interfaces/IStrategy.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
+/**
+ * @title TestDelegationManager
+ * @notice A mock Delegation Manager contract for testing
+ */
 contract TestDelegationManager is IDelegationManager {
     mapping(address => bool) public isOperator;
     mapping(address => mapping(IStrategy => uint256)) public operatorShares;
@@ -157,11 +161,30 @@ contract TestDelegationManager is IDelegationManager {
 
     function updateOperatorMetadataURI(string calldata /* metadataURI */) external {}
 
-    function queueWithdrawals(QueuedWithdrawalParams[] calldata /* queuedWithdrawalParams */)
-        external
-        pure
-        returns (bytes32[] memory)
-    {
+    function queueWithdrawals(
+        QueuedWithdrawalParams[] calldata /* queuedWithdrawalParams */,
+        uint256[] calldata /* middlewareTimesIndexes */,
+        bool[] calldata /* receiveAsTokens */
+    ) external {}
+
+    function getDelegatableShares(address /* staker */) external pure returns (IStrategy[] memory strategies, uint256[] memory shares) {
+        // Mock implementation returning empty arrays
+        strategies = new IStrategy[](0);
+        shares = new uint256[](0);
+    }
+
+    function setMinWithdrawalDelayBlocks(uint256 /* newMinWithdrawalDelayBlocks */) external {
+        // Mock implementation - no-op
+    }
+
+    function setStrategyWithdrawalDelayBlocks(
+        IStrategy[] calldata /* strategies */,
+        uint256[] calldata /* withdrawalDelayBlocks */
+    ) external {
+        // Mock implementation - no-op
+    }
+
+    function queueWithdrawals(QueuedWithdrawalParams[] calldata /* queuedWithdrawalParams */) external pure returns (bytes32[] memory) {
         return new bytes32[](0);
     }
 

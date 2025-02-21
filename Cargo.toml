@@ -1,5 +1,5 @@
 [package]
-name = "ecdsa"
+name = "{{project-name}}"
 version = "0.1.0"
 edition = "2021"
 description = "{{project-description}}"
@@ -14,14 +14,11 @@ rust-version = "1.81"
 
 [dependencies]
 blueprint-sdk = { git = "https://github.com/tangle-network/gadget", default-features = false, features = ["eigenlayer", "evm", "macros", "build"] }
-#blueprint-sdk = { path = "../gadget/crates/sdk", default-features = false, features = ["eigenlayer", "evm", "macros", "build"] }
 serde = { version = "1.0.188", features = ["derive"] }
 async-trait = { version = "0.1.85" }
 
 [build-dependencies]
 blueprint-sdk = { git = "https://github.com/tangle-network/gadget", default-features = false, features = ["build"] }
-#blueprint-sdk = { path = "../gadget/crates/sdk", default-features = false, features = ["build"] }
-
 
 [features]
 default = ["std"]
@@ -31,11 +28,11 @@ std = ["blueprint-sdk/std"]
 path = "src/lib.rs"
 
 [[bin]]
-name = "ecdsa"
+name = "{{project-name}}"
 path = "src/main.rs"
 
 [package.metadata.blueprint]
-manager = { Evm = "HelloBlueprint" }
+manager = { Evm = "TangleServiceManager" }
 
 [[package.metadata.gadget.Native.sources]]
 owner = "{{gh-username}}"

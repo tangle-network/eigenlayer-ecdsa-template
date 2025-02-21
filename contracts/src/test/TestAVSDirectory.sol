@@ -61,4 +61,8 @@ contract TestAVSDirectory is IAVSDirectory {
     function domainSeparator() public view returns (bytes32) {
         return keccak256(abi.encode(DOMAIN_TYPEHASH, keccak256(bytes("EigenLayer")), block.chainid, address(this)));
     }
+
+    function cancelSalt(bytes32 salt) external {
+        operatorSalts[msg.sender][salt] = true;
+    }
 }

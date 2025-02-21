@@ -41,7 +41,7 @@ pub struct ExampleContext {
     id = 0,
     params(who),
     event_listener(
-        listener = EvmContractEventListener<TangleServiceManager::OperatorRegisteredToAVS>,
+        listener = EvmContractEventListener<ExampleContext, TangleServiceManager::OperatorRegisteredToAVS>,
         instance = TangleServiceManager,
         abi = TANGLE_SERVICE_MANAGER_ABI_STRING,
         pre_processor = example_pre_processor,
