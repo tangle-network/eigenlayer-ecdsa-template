@@ -3,9 +3,9 @@ pragma solidity >=0.8.0;
 
 // ============ Internal Imports ============
 import {Enrollment, EnrollmentStatus, EnumerableMapEnrollment} from "./libs/EnumerableMapEnrollment.sol";
-import {IAVSDirectory} from "./interfaces/vendored/IAVSDirectory.sol";
-import {ISlasher} from "./interfaces/vendored/ISlasher.sol";
-import {ECDSAServiceManagerBase} from "./ECDSAServiceManagerBase.sol";
+import {IAVSDirectory} from "@eigenlayer-contracts/interfaces/IAVSDirectory.sol";
+import {ISlasher} from "@eigenlayer-contracts/interfaces/ISlasher.sol";
+import {ECDSAServiceManagerBase} from "eigenlayer-middleware/src/unaudited/ECDSAServiceManagerBase.sol";
 import {IRemoteChallenger} from "./interfaces/IRemoteChallenger.sol";
 
 contract TangleServiceManager is ECDSAServiceManagerBase {
@@ -20,6 +20,18 @@ contract TangleServiceManager is ECDSAServiceManagerBase {
     ISlasher internal slasher;
 
     // ============ Events ============
+
+    /**
+     * @notice Emitted when an operator is registered to the AVS
+     * @param operator The address of the operator
+     */
+    event OperatorRegisteredToAVS(address indexed operator);
+
+    /**
+     * @notice Emitted when an operator is deregistered from the AVS
+     * @param operator The address of the operator
+     */
+    event OperatorDeregisteredFromAVS(address indexed operator);
 
     /**
      * @notice Emitted when an operator is enrolled in a challenger
@@ -52,13 +64,13 @@ contract TangleServiceManager is ECDSAServiceManagerBase {
     // ============ Internal Storage ============
 
     // Mapping of operators to challengers they are enrolled in (enumerable required for remove-all)
-    mapping(address => EnumerableMapEnrollment.AddressToEnrollmentMap) internal enrolledChallengers;
+    mapping(address => EnumerableMapEnrollment.AddressToEnrollmentMap) internal _enrolledChallengers;
 
     // ============ Modifiers ============
 
     // Only allows the challenger the operator is enrolled in to call the function
     modifier onlyEnrolledChallenger(address operator) {
-        (bool exists,) = enrolledChallengers[operator].tryGet(msg.sender);
+        (bool exists,) = _enrolledChallengers[operator].tryGet(msg.sender);
         require(exists, "TangleServiceManager: Operator not enrolled in challenger");
         _;
     }
@@ -79,10 +91,12 @@ contract TangleServiceManager is ECDSAServiceManagerBase {
     {}
 
     /**
-     * @notice Initializes the TangleServiceManager.sol contract with the owner address
+     * @notice Initializes the TangleServiceManager contract
+     * @param _owner Address of the contract owner
+     * @param _rewardsInitiator Address that can initiate rewards
      */
-    function initialize(address _owner) public initializer {
-        __ServiceManagerBase_init(_owner);
+    function initialize(address _owner, address _rewardsInitiator) public initializer {
+        __ServiceManagerBase_init(_owner, _rewardsInitiator);
     }
 
     // ============ External Functions ============
@@ -133,7 +147,7 @@ contract TangleServiceManager is ECDSAServiceManagerBase {
         view
         returns (Enrollment memory enrollment)
     {
-        return enrolledChallengers[_operator].get(address(_challenger));
+        return _enrolledChallengers[_operator].get(address(_challenger));
     }
 
     /**
@@ -152,7 +166,7 @@ contract TangleServiceManager is ECDSAServiceManagerBase {
      * @param _operator The address of the operator
      */
     function getOperatorChallengers(address _operator) public view returns (address[] memory) {
-        return enrolledChallengers[_operator].keys();
+        return _enrolledChallengers[_operator].keys();
     }
 
     /**
@@ -160,7 +174,7 @@ contract TangleServiceManager is ECDSAServiceManagerBase {
      * @param challenger The challenger to enroll into
      */
     function enrollIntoChallenger(IRemoteChallenger challenger) public {
-        require(enrolledChallengers[msg.sender].set(address(challenger), Enrollment(EnrollmentStatus.ENROLLED, 0)));
+        require(_enrolledChallengers[msg.sender].set(address(challenger), Enrollment(EnrollmentStatus.ENROLLED, 0)), "TangleServiceManager: Failed to enroll into challenger");
         emit OperatorEnrolledToChallenger(msg.sender, challenger);
     }
 
@@ -169,12 +183,12 @@ contract TangleServiceManager is ECDSAServiceManagerBase {
      * @param challenger The challenger to unenroll from
      */
     function startUnenrollment(IRemoteChallenger challenger) public {
-        (bool exists, Enrollment memory enrollment) = enrolledChallengers[msg.sender].tryGet(address(challenger));
+        (bool exists, Enrollment memory enrollment) = _enrolledChallengers[msg.sender].tryGet(address(challenger));
         require(
             exists && enrollment.status == EnrollmentStatus.ENROLLED, "TangleServiceManager: challenger isn't enrolled"
         );
 
-        enrolledChallengers[msg.sender].set(
+        _enrolledChallengers[msg.sender].set(
             address(challenger), Enrollment(EnrollmentStatus.PENDING_UNENROLLMENT, uint248(block.number))
         );
         emit OperatorQueuedUnenrollmentFromChallenger(
@@ -210,7 +224,7 @@ contract TangleServiceManager is ECDSAServiceManagerBase {
      */
     function _completeUnenrollment(address operator, address _challenger) internal {
         IRemoteChallenger challenger = IRemoteChallenger(_challenger);
-        (bool exists, Enrollment memory enrollment) = enrolledChallengers[operator].tryGet(address(challenger));
+        (bool exists, Enrollment memory enrollment) = _enrolledChallengers[operator].tryGet(address(challenger));
 
         require(
             exists && enrollment.status == EnrollmentStatus.PENDING_UNENROLLMENT
@@ -218,7 +232,7 @@ contract TangleServiceManager is ECDSAServiceManagerBase {
             "TangleServiceManager: Invalid unenrollment"
         );
 
-        enrolledChallengers[operator].remove(address(challenger));
+        _enrolledChallengers[operator].remove(address(challenger));
         emit OperatorUnenrolledFromChallenger(operator, challenger, block.number);
     }
 

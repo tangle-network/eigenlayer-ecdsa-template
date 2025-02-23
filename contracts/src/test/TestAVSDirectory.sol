@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 pragma solidity >=0.8.0;
 
-import {IAVSDirectory} from "../interfaces/vendored/IAVSDirectory.sol";
-import {ISignatureUtils} from "../interfaces/vendored/ISignatureUtils.sol";
-import {ISlasher} from "../interfaces/vendored/ISlasher.sol";
+import {IAVSDirectory} from "@eigenlayer-contracts/interfaces/IAVSDirectory.sol";
+import {ISignatureUtils} from "@eigenlayer-contracts/interfaces/ISignatureUtils.sol";
+import {ISlasher} from "@eigenlayer-contracts/interfaces/ISlasher.sol";
 
 import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
@@ -14,9 +14,14 @@ contract TestAVSDirectory is IAVSDirectory {
         keccak256("EIP712Domain(string name,uint256 chainId,address verifyingContract)");
 
     mapping(address => mapping(address => OperatorAVSRegistrationStatus)) public avsOperatorStatus;
+    mapping(address => mapping(bytes32 => bool)) public operatorSalts;
 
     function updateAVSMetadataURI(string calldata metadataURI) external {
         emit AVSMetadataURIUpdated(msg.sender, metadataURI);
+    }
+
+    function operatorSaltIsSpent(address operator, bytes32 salt) external view returns (bool) {
+        return operatorSalts[operator][salt];
     }
 
     function registerOperatorToAVS(
@@ -34,6 +39,7 @@ contract TestAVSDirectory is IAVSDirectory {
             "EIP1271SignatureUtils.checkSignature_EIP1271: signature not from signer"
         );
         avsOperatorStatus[msg.sender][operator] = OperatorAVSRegistrationStatus.REGISTERED;
+        operatorSalts[operator][operatorSignature.salt] = true;
     }
 
     function deregisterOperatorFromAVS(address operator) external {
@@ -54,5 +60,9 @@ contract TestAVSDirectory is IAVSDirectory {
 
     function domainSeparator() public view returns (bytes32) {
         return keccak256(abi.encode(DOMAIN_TYPEHASH, keccak256(bytes("EigenLayer")), block.chainid, address(this)));
+    }
+
+    function cancelSalt(bytes32 salt) external {
+        operatorSalts[msg.sender][salt] = true;
     }
 }

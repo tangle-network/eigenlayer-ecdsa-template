@@ -8,7 +8,6 @@ use blueprint_sdk::macros::load_abi;
 use blueprint_sdk::std::convert::Infallible;
 use blueprint_sdk::std::sync::LazyLock;
 use serde::{Deserialize, Serialize};
-pub mod config;
 
 type ProcessorError =
     blueprint_sdk::event_listeners::core::Error<blueprint_sdk::event_listeners::evm::error::Error>;
@@ -42,7 +41,7 @@ pub struct ExampleContext {
     id = 0,
     params(who),
     event_listener(
-        listener = EvmContractEventListener<TangleServiceManager::OperatorRegisteredToAVS>,
+        listener = EvmContractEventListener<ExampleContext, TangleServiceManager::OperatorRegisteredToAVS>,
         instance = TangleServiceManager,
         abi = TANGLE_SERVICE_MANAGER_ABI_STRING,
         pre_processor = example_pre_processor,
