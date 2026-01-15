@@ -1,16 +1,11 @@
-use blueprint_sdk::alloy::primitives::{address, Address};
-use blueprint_sdk::alloy::rpc::types::Log;
-use blueprint_sdk::alloy::sol;
-use blueprint_sdk::config::GadgetConfiguration;
-use blueprint_sdk::event_listeners::evm::EvmContractEventListener;
-use blueprint_sdk::job;
-use blueprint_sdk::macros::load_abi;
-use blueprint_sdk::std::convert::Infallible;
-use blueprint_sdk::std::sync::LazyLock;
+use alloy::primitives::{address, Address};
+use alloy::sol;
+use blueprint_sdk::runner::config::BlueprintEnvironment;
+use blueprint_sdk::macros::context::KeystoreContext;
+use blueprint_sdk::evm::extract::BlockEvents;
+use blueprint_sdk::extract::Context;
 use serde::{Deserialize, Serialize};
-
-type ProcessorError =
-    blueprint_sdk::event_listeners::core::Error<blueprint_sdk::event_listeners::evm::error::Error>;
+use std::sync::LazyLock;
 
 sol!(
     #[allow(missing_docs)]
@@ -20,43 +15,43 @@ sol!(
     "contracts/out/TangleServiceManager.sol/TangleServiceManager.json"
 );
 
-load_abi!(
-    TANGLE_SERVICE_MANAGER_ABI_STRING,
-    "contracts/out/TangleServiceManager.sol/TangleServiceManager.json"
-);
-
 pub static SERVICE_MANAGER_ADDRESS: LazyLock<Address> = LazyLock::new(|| {
     std::env::var("SERVICE_MANAGER_ADDRESS")
         .map(|addr| addr.parse().expect("Invalid SERVICE_MANAGER_ADDRESS"))
         .unwrap_or_else(|_| address!("0000000000000000000000000000000000000000"))
 });
 
-#[derive(Clone)]
+/// The context for the blueprint, containing configuration and any shared state.
+#[derive(Clone, KeystoreContext)]
 pub struct ExampleContext {
-    pub config: GadgetConfiguration,
+    #[config]
+    pub env: BlueprintEnvironment,
 }
 
 /// Returns "Hello, {who}!"
-#[job(
-    id = 0,
-    params(who),
-    event_listener(
-        listener = EvmContractEventListener<ExampleContext, TangleServiceManager::OperatorRegisteredToAVS>,
-        instance = TangleServiceManager,
-        abi = TANGLE_SERVICE_MANAGER_ABI_STRING,
-        pre_processor = example_pre_processor,
-    ),
-)]
-pub fn say_hello(context: ExampleContext, who: String) -> Result<String, Infallible> {
-    Ok(format!("Hello, {who}!"))
-}
+///
+/// This job is triggered by `OperatorRegisteredToAVS` events from the TangleServiceManager contract.
+/// It extracts the operator address from the event and returns a greeting.
+#[blueprint_sdk::macros::debug_job]
+pub async fn say_hello(
+    Context(_ctx): Context<ExampleContext>,
+    BlockEvents(events): BlockEvents,
+) -> Result<(), std::convert::Infallible> {
+    use alloy::sol_types::SolEvent;
 
-/// Example pre-processor for handling inbound events
-async fn example_pre_processor(
-    (_event, log): (TangleServiceManager::OperatorRegisteredToAVS, Log),
-) -> Result<Option<(String,)>, ProcessorError> {
-    let who = log.address();
-    Ok(Some((who.to_string(),)))
+    // Filter for OperatorRegisteredToAVS events
+    let registration_events = events.iter().filter_map(|log| {
+        TangleServiceManager::OperatorRegisteredToAVS::decode_log(&log.inner)
+            .map(|event| event.data)
+            .ok()
+    });
+
+    for event in registration_events {
+        let who = event.operator;
+        blueprint_sdk::info!("Hello, {}!", who);
+    }
+
+    Ok(())
 }
 
 #[cfg(test)]
@@ -64,10 +59,8 @@ mod tests {
     use super::*;
 
     #[test]
-    fn it_works() {
-        let config = GadgetConfiguration::default();
-        let context = ExampleContext { config };
-        let result = say_hello(context, "Alice".into()).unwrap();
-        assert_eq!(result, "Hello, Alice!");
+    fn context_can_be_created() {
+        let env = BlueprintEnvironment::default();
+        let _context = ExampleContext { env };
     }
 }

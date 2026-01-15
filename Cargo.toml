@@ -1,7 +1,7 @@
 [package]
 name = "{{project-name}}"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 description = "{{project-description}}"
 authors = ["{{authors}}"]
 license = "MIT OR Apache-2.0"
@@ -10,15 +10,17 @@ repository = "https://github.com/{{gh-username}}/{{project-name}}"
 readme = "README.md"
 categories = ["cryptography", "cryptography::cryptocurrencies"]
 keywords = ["tangle", "blueprint", "avs"]
-rust-version = "1.81"
+rust-version = "1.86"
 
 [dependencies]
-blueprint-sdk = { git = "https://github.com/tangle-network/gadget", default-features = false, features = ["eigenlayer", "evm", "macros", "build"] }
-serde = { version = "1.0.188", features = ["derive"] }
-async-trait = { version = "0.1.85" }
+blueprint-sdk = { git = "https://github.com/tangle-network/blueprint", branch = "v2", default-features = false, features = ["std", "eigenlayer", "evm", "macros"] }
+serde = { version = "1.0", features = ["derive"] }
+tokio = { version = "1", features = ["full"] }
+alloy = { version = "0.12", features = ["sol-types", "contract", "rpc-types", "signer-local", "network", "providers"] }
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
 
 [build-dependencies]
-blueprint-sdk = { git = "https://github.com/tangle-network/gadget", default-features = false, features = ["build"] }
+blueprint-build-utils = { git = "https://github.com/tangle-network/blueprint", branch = "v2" }
 
 [features]
 default = ["std"]
