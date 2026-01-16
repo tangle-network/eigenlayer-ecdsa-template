@@ -1,6 +1,6 @@
 use {{project-name | snake_case}} as blueprint;
 use blueprint::{ExampleContext, SERVICE_MANAGER_ADDRESS};
-use alloy::primitives::Address;
+use blueprint_sdk::alloy::primitives::Address;
 use blueprint_sdk::evm::producer::{PollingConfig, PollingProducer};
 use blueprint_sdk::evm::util::get_provider_http;
 use blueprint_sdk::runner::BlueprintRunner;

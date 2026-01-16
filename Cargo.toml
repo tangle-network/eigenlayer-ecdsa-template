@@ -16,7 +16,6 @@ rust-version = "1.86"
 blueprint-sdk = { git = "https://github.com/tangle-network/blueprint", branch = "v2", default-features = false, features = ["std", "eigenlayer", "evm", "macros"] }
 serde = { version = "1.0", features = ["derive"] }
 tokio = { version = "1", features = ["full"] }
-alloy = { version = "0.12", features = ["sol-types", "contract", "rpc-types", "signer-local", "network", "providers"] }
 tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
 
 [build-dependencies]

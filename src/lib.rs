@@ -1,5 +1,5 @@
-use alloy::primitives::{address, Address};
-use alloy::sol;
+use blueprint_sdk::alloy::primitives::{address, Address};
+use blueprint_sdk::alloy::sol;
 use blueprint_sdk::runner::config::BlueprintEnvironment;
 use blueprint_sdk::macros::context::KeystoreContext;
 use blueprint_sdk::evm::extract::BlockEvents;
@@ -37,7 +37,7 @@ pub async fn say_hello(
     Context(_ctx): Context<ExampleContext>,
     BlockEvents(events): BlockEvents,
 ) -> Result<(), std::convert::Infallible> {
-    use alloy::sol_types::SolEvent;
+    use blueprint_sdk::alloy::sol_types::SolEvent;
 
     // Filter for OperatorRegisteredToAVS events
     let registration_events = events.iter().filter_map(|log| {
