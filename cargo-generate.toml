@@ -33,6 +33,11 @@ type = "bool"
 prompt = "Do you want to generate a Dockerfile?"
 default = true
 
+[placeholders.docker]
+type = "bool"
+prompt = "Do you want to generate a Dockerfile for your gadget?"
+default = true
+
 [placeholders.base-image]
 type = "string"
 prompt = "What base image should be used?"
